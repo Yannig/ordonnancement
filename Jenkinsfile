@@ -6,15 +6,19 @@ parameters = [
 ]
 properties([ parameters(parameters) ])
 
+def cmdInVirtualEnv(cmd) {
+  sh(". $WORKSPACE/python/bin/activate > /dev/null 2>&1 ; ${cmd}")
+}
+
 def betterCallAnsible(parameters) {
   print("Lancement d'ansible sur l'inventaire ${params.plateforme}")
-  sh(". $WORKSPACE/python/bin/activate ; ansible --version")
+  cmdInVirtualEnv("ansible --version")
 }
 
 node() {
   stage('install') {
     sh("virtualenv $WORKSPACE/python")
-    sh(". $WORKSPACE/python/bin/activate ; pip install ansible mitogen --upgrade")
+    cmdInVirtualEnv("pip install ansible mitogen --upgrade")
   }
   stage('init') {
     dir('common') {
