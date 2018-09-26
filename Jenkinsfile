@@ -3,6 +3,7 @@ parameters = [
   string(name: 'branch',     description: "Branche du repository common", defaultValue: "master"),
   string(name: 'app_name',   description: "Nom de l'application", defaultValue: ""),
   string(name: 'app_version',   description: "Version de l'application", defaultValue: ""),
+  booleanParam(name: 'disableInstall', description: "Désactiver l'installation", defaultValue: false),
 ]
 properties([ parameters(parameters) ])
 
@@ -25,8 +26,10 @@ def betterCallAnsible(parameters) {
 
 node() {
   stage('install') {
-    sh("virtualenv $WORKSPACE/python")
-    cmdInVirtualEnv("pip install ansible mitogen --upgrade")
+    if(!params.disableInstall) {
+      sh("virtualenv $WORKSPACE/python")
+      cmdInVirtualEnv("pip install ansible mitogen --upgrade")
+    }
   }
   stage('init') {
     dir('common') {
