@@ -6,13 +6,21 @@ parameters = [
 ]
 properties([ parameters(parameters) ])
 
+ansibleEnv = [
+  "ANSIBLE_STRATEGY=mitogen_linear",
+  "ANSIBLE_CALLBACK_WHITELIST=profile_tasks,timer",
+  "ANSIBLE_STRATEGY_PLUGINS=${env.WORKSPACE}/lib/python2.7/site-packages/mitogen/ansible_mitogen/plugins/strategy"
+]
+
 def cmdInVirtualEnv(cmd) {
   sh(". $WORKSPACE/python/bin/activate > /dev/null 2>&1 ; ${cmd}")
 }
 
 def betterCallAnsible(parameters) {
   print("Lancement d'ansible sur l'inventaire ${params.plateforme}")
-  cmdInVirtualEnv("ansible --version")
+  withEnv(ansibleEnv) {
+    cmdInVirtualEnv("ansible --version")
+  }
 }
 
 node() {
